@@ -1,0 +1,35 @@
+{
+  "name": "tinypng-cli",
+  "version": "0.0.1",
+  "description": "Handy command line tool for shrinking PNG images using the TinyPNG API",
+  "homepage": "https://github.com/websperts/tinypng-cli",
+  "author": "websperts <hello@websperts.com>",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:websperts/tinypng-cli.git"
+  },
+  "keywords": [
+    "tinypng",
+    "shrinking",
+    "compression",
+    "cli"
+  ],
+  "bugs": {
+    "url": "https://github.com/websperts/tinypng-cli/issues"
+  },
+  "main": "tinypng-cli.js",
+  "license": "MIT",
+  "dependencies": {
+    "array-uniq": "^1.0.1",
+    "chalk": "^0.5.1",
+    "glob": "^4.0.6",
+    "minimatch": "^1.0.0",
+    "minimist": "^1.1.0",
+    "prettysize": "0.0.3",
+    "request": "^2.45.0"
+  },
+  "preferGlobal": "true",
+  "bin": {
+    "tinypng": "tinypng-cli.js"
+  }
+}
