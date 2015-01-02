@@ -26,6 +26,7 @@ if (argv.v || argv.version) {
         '  tinypng .\n' +
         '  tinypng assets/img\n' +
         '  tinypng assets/img/test.png\n' +
+        '  tinypng assets/img/test.jpg\n' +
         '\n' +
         'Options\n' +
         '  -k, --key         Provide an API key\n' +
@@ -59,8 +60,8 @@ if (argv.v || argv.version) {
         files.forEach(function(file) {
             if (fs.existsSync(file)) {
                 if (fs.lstatSync(file).isDirectory()) {
-                    images = images.concat(glob.sync(file + '/**/*.png'));
-                } else if(minimatch(file, '*.png', {
+                    images = images.concat(glob.sync(file + '/**/*.+(png|jpg|jpeg)'));
+                } else if(minimatch(file, '*.+(png|jpg|jpeg)', {
                     matchBase: true
                 })) {
                     images.push(file);
@@ -72,11 +73,11 @@ if (argv.v || argv.version) {
 
         if (unique.length === 0) {
 
-            console.log(chalk.bold.red('\u2718 No PNG images found.'));
+            console.log(chalk.bold.red('\u2718 No PNG or JPEG images found.'));
 
         } else {
 
-            console.log(chalk.bold.green('\u2714 Found ' + unique.length + ' PNG image' + (unique.length === 1 ? '' : 's')) + '\n');
+            console.log(chalk.bold.green('\u2714 Found ' + unique.length + ' image' + (unique.length === 1 ? '' : 's')) + '\n');
             console.log(chalk.bold('Processing...'));
 
             unique.forEach(function(file) {
