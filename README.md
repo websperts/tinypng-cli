@@ -45,6 +45,8 @@ That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.2
+	* JP(E)G support
 * 0.0.1
 	* Initial version
 
@@ -59,3 +61,8 @@ Copyright (c) 2014 [websperts](http://websperts.com/)
 Licensed under the MIT license.
 
 See LICENSE for more info.
+
+## Contributors
+
+- [@rasshofer](https://github.com/rasshofer)
+- [@maxkueng](https://github.com/maxkueng)
