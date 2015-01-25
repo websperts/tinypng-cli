@@ -81,6 +81,8 @@ if (argv.v || argv.version) {
             console.log(chalk.bold('Processing...'));
 
             unique.forEach(function(file) {
+                
+                file = file.replace(/^\.\//, '');
 
                 fs.createReadStream(file).pipe(request.post('https://api.tinypng.com/shrink', {
                     auth: {
