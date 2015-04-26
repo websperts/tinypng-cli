@@ -10,7 +10,7 @@ var pretty = require('prettysize');
 
 var argv = require('minimist')(process.argv.slice(2));
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-var version = '0.0.1';
+var version = '0.0.2';
 
 if (argv.v || argv.version) {
 
