@@ -10,7 +10,7 @@ var pretty = require('prettysize');
 
 var argv = require('minimist')(process.argv.slice(2));
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-var version = '0.0.2';
+var version = '0.0.3';
 
 if (argv.v || argv.version) {
 
@@ -82,14 +82,18 @@ if (argv.v || argv.version) {
 
             unique.forEach(function(file) {
 
-                fs.createReadStream(file).pipe(request.post('https://api.tinypng.com/shrink', {
+                fs.createReadStream(file).pipe(request.post('https://api.tinify.com/shrink', {
                     auth: {
                         'user': 'api',
                         'pass': key
                     }
                 }, function (error, response, body) {
 
-                    body = JSON.parse(body);
+                    try {
+                        body = JSON.parse(body);
+                    } catch(e) {
+                        console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
+                    }
 
                     if (response.statusCode === 201) {
 

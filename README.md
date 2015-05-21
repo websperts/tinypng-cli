@@ -45,6 +45,9 @@ That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.3
+  * Updated API endpoint
+  * Check for valid JSON response
 * 0.0.2
 	* JP(E)G support
 * 0.0.1
