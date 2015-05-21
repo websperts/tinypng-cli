@@ -95,29 +95,34 @@ if (argv.v || argv.version) {
                         console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
                     }
 
-                    if (response.statusCode === 201) {
+                    if(response !== undefined) {
 
-                        if (body.output.size < body.input.size) {
+                        if (response.statusCode === 201) {
 
-                            console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
-                            request.get(body.output.url).pipe(fs.createWriteStream(file));
+                            if (body.output.size < body.input.size) {
+
+                                console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
+                                request.get(body.output.url).pipe(fs.createWriteStream(file));
+
+                            } else {
+
+                                console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
+
+                            }
 
                         } else {
 
-                            console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
+                            if (body.error === 'TooManyRequests') {
+                                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your monthly limit has been exceeded'));
+                            } else if (body.error === 'Unauthorized') {
+                                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your credentials are invalid'));
+                            } else {
+                                console.log(chalk.red('\u2718 Compression failed for `' + file + '`'));
+                            }
 
                         }
-
                     } else {
-
-                        if (body.error === 'TooManyRequests') {
-                            console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your monthly limit has been exceeded'));
-                        } else if (body.error === 'Unauthorized') {
-                            console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your credentials are invalid'));
-                        } else {
-                            console.log(chalk.red('\u2718 Compression failed for `' + file + '`'));
-                        }
-
+                        console.log(chalk.red('\u2718 Got no response for `' + file + '`'));
                     }
                 }));
 
