@@ -69,3 +69,4 @@ See LICENSE for more info.
 
 - [@rasshofer](https://github.com/rasshofer)
 - [@maxkueng](https://github.com/maxkueng)
+- [@tholu](https://github.com/tholu)
