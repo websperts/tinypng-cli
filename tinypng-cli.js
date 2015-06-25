@@ -10,7 +10,7 @@ var pretty = require('prettysize');
 
 var argv = require('minimist')(process.argv.slice(2));
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-var version = '0.0.3';
+var version = '0.0.4';
 
 if (argv.v || argv.version) {
 
@@ -30,6 +30,7 @@ if (argv.v || argv.version) {
         '\n' +
         'Options\n' +
         '  -k, --key         Provide an API key\n' +
+        '  -r, --recursive   Walk given directory recursively\n' +
         '  -v, --version     Show installed version\n' +
         '  -h, --help        Show help'
     );
@@ -60,7 +61,7 @@ if (argv.v || argv.version) {
         files.forEach(function(file) {
             if (fs.existsSync(file)) {
                 if (fs.lstatSync(file).isDirectory()) {
-                    images = images.concat(glob.sync(file + '/**/*.+(png|jpg|jpeg)'));
+                    images = images.concat(glob.sync(file + (argv.r || argv.recursive ? '/**' : '') + '/*.+(png|jpg|jpeg)'));
                 } else if(minimatch(file, '*.+(png|jpg|jpeg)', {
                     matchBase: true
                 })) {
