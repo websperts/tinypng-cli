@@ -45,6 +45,8 @@ That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.4
+  * Make recursive directory walking optional
 * 0.0.3
   * Updated API endpoint
   * Check for valid JSON response
@@ -60,7 +62,7 @@ That's it. Pretty easy, huh?
 
 ## License
 
-Copyright (c) 2014 [websperts](http://websperts.com/)  
+Copyright (c) 2015 [websperts](http://websperts.com/)  
 Licensed under the MIT license.
 
 See LICENSE for more info.
@@ -70,3 +72,4 @@ See LICENSE for more info.
 - [@rasshofer](https://github.com/rasshofer)
 - [@maxkueng](https://github.com/maxkueng)
 - [@tholu](https://github.com/tholu)
+- [@mvenghaus](https://github.com/mvenghaus)
