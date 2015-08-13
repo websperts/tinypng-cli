@@ -62,8 +62,8 @@ if (argv.v || argv.version) {
     }
 
     if (argv.rh || argv.height) {
-      if(typeof (argv.rw || argv.height) === 'number') {
-        resize.height = (argv.rw || argv.height);
+      if(typeof (argv.rh || argv.height) === 'number') {
+        resize.height = (argv.rh || argv.height);
       } else {
         console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
       }
