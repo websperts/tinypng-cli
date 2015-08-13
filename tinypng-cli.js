@@ -30,6 +30,8 @@ if (argv.v || argv.version) {
         '\n' +
         'Options\n' +
         '  -k, --key         Provide an API key\n' +
+        '  -rw, --width      Resize an image to a specified width\n' +
+        '  -rh, --height     Resize an image to a specified height\n' +
         '  -r, --recursive   Walk given directory recursively\n' +
         '  -v, --version     Show installed version\n' +
         '  -h, --help        Show help'
@@ -43,11 +45,28 @@ if (argv.v || argv.version) {
     var files = argv._.length ? argv._ : ['.'];
 
     var key = '';
+    var resize = {};
 
     if (argv.k || argv.key) {
         key = typeof (argv.k || argv.key) === 'string' ? (argv.k || argv.key).trim() : '';
     } else if (fs.existsSync(home + '/.tinypng')) {
         key = fs.readFileSync(home + '/.tinypng', 'utf8').trim();
+    }
+
+    if (argv.rw || argv.width) {
+      if(typeof (argv.rw || argv.width) === 'number') {
+        resize.width = (argv.rw || argv.width);
+      } else {
+        console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
+      }
+    }
+
+    if (argv.rh || argv.height) {
+      if(typeof (argv.rw || argv.height) === 'number') {
+        resize.height = (argv.rw || argv.height);
+      } else {
+        console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
+      }
     }
 
     if (key.length === 0) {
@@ -103,7 +122,16 @@ if (argv.v || argv.version) {
                             if (body.output.size < body.input.size) {
 
                                 console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
-                                request.get(body.output.url).pipe(fs.createWriteStream(file));
+
+                                if(resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
+                                  request.get(body.output.url, {
+                                    auth: {'user': 'api','pass': key},
+                                    json:{'resize':resize}}).pipe(fs.createWriteStream(file));
+                                } else {
+
+                                  request.get(body.output.url).pipe(fs.createWriteStream(file));
+
+                                }
 
                             } else {
 
