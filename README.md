@@ -16,14 +16,18 @@ TinyPNG CLI allows you to provide your API key in two different ways. The more c
 
 	tinypng demo.png -k E99a18c4f8cb3EL5f2l08u368_922e03
 
-To shrink all PNG images within the current directory and its subdirectories, you may run one of the following commands—both do exactly the same.
+To shrink all PNG images within the current directory, you may run one of the following commands—both do exactly the same.
 
 	tinypng
 	tinypng .
 
+To shrink all PNG images within the current directory and subdirectoies, use the `-r` flag
+
+	tinypng -r
+
 ***
 	
-To shrink all PNG images within a specific directory (`assets/img` in this example) and its subdirectories, you may run the following command.
+To shrink all PNG images within a specific directory (`assets/img` in this example), you may run the following command.
 
 	tinypng assets/img
 
