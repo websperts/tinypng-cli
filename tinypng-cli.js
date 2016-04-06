@@ -54,19 +54,19 @@ if (argv.v || argv.version) {
     }
 
     if (argv.rw || argv.width) {
-      if(typeof (argv.rw || argv.width) === 'number') {
-        resize.width = (argv.rw || argv.width);
-      } else {
-        console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
-      }
+        if (typeof (argv.rw || argv.width) === 'number') {
+            resize.width = (argv.rw || argv.width);
+        } else {
+            console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
+        }
     }
 
     if (argv.rh || argv.height) {
-      if(typeof (argv.rh || argv.height) === 'number') {
-        resize.height = (argv.rh || argv.height);
-      } else {
-        console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
-      }
+        if (typeof (argv.rh || argv.height) === 'number') {
+            resize.height = (argv.rh || argv.height);
+        } else {
+            console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
+        }
     }
 
     if (key.length === 0) {
@@ -81,7 +81,7 @@ if (argv.v || argv.version) {
             if (fs.existsSync(file)) {
                 if (fs.lstatSync(file).isDirectory()) {
                     images = images.concat(glob.sync(file + (argv.r || argv.recursive ? '/**' : '') + '/*.+(png|jpg|jpeg)'));
-                } else if(minimatch(file, '*.+(png|jpg|jpeg)', {
+                } else if (minimatch(file, '*.+(png|jpg|jpeg)', {
                     matchBase: true
                 })) {
                     images.push(file);
@@ -115,7 +115,7 @@ if (argv.v || argv.version) {
                         console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
                     }
 
-                    if(response !== undefined) {
+                    if (response !== undefined) {
 
                         if (response.statusCode === 201) {
 
@@ -123,7 +123,7 @@ if (argv.v || argv.version) {
 
                                 console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
 
-                                if(resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
+                                if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
                                   request.get(body.output.url, {
                                     auth: {'user': 'api','pass': key},
                                     json:{'resize':resize}}).pipe(fs.createWriteStream(file));
