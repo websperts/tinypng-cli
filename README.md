@@ -25,8 +25,6 @@ To shrink all PNG images within the current directory and subdirectoies, use the
 
 	tinypng -r
 
-***
-	
 To shrink all PNG images within a specific directory (`assets/img` in this example), you may run the following command.
 
 	tinypng assets/img
@@ -34,9 +32,7 @@ To shrink all PNG images within a specific directory (`assets/img` in this examp
 You may also provide multiple directories.
 
 	tinypng assets/img1 assets/img2
-	
-***
-	
+
 To shrink a single PNG image (`assets/img/demo.png` in this example), you may run the following command.
 
 	tinypng assets/img/demo.png
@@ -55,6 +51,8 @@ That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.5
+	* Add support for image resize functionality
 * 0.0.4
   * Make recursive directory walking optional
 * 0.0.3
@@ -72,7 +70,7 @@ That's it. Pretty easy, huh?
 
 ## License
 
-Copyright (c) 2015 [websperts](http://websperts.com/)  
+Copyright (c) 2016 [websperts](http://websperts.com/)  
 Licensed under the MIT license.
 
 See LICENSE for more info.
@@ -83,3 +81,5 @@ See LICENSE for more info.
 - [@maxkueng](https://github.com/maxkueng)
 - [@tholu](https://github.com/tholu)
 - [@mvenghaus](https://github.com/mvenghaus)
+- [@jblok](https://github.com/jblok)
+- [@tomatolicious](https://github.com/tomatolicious)
