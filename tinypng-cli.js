@@ -29,12 +29,12 @@ if (argv.v || argv.version) {
     '  tinypng assets/img/test.jpg\n' +
     '\n' +
     'Options\n' +
-    '  -k, --key     Provide an API key\n' +
-    '  -rw, --width    Resize an image to a specified width\n' +
-    '  -rh, --height   Resize an image to a specified height\n' +
-    '  -r, --recursive   Walk given directory recursively\n' +
-    '  -v, --version   Show installed version\n' +
-    '  -h, --help    Show help'
+    '  -k, --key        Provide an API key\n' +
+    '  -r, --recursive  Walk given directory recursively\n' +
+    '  --width          Resize an image to a specified width\n' +
+    '  --height         Resize an image to a specified height\n' +
+    '  -v, --version    Show installed version\n' +
+    '  -h, --help       Show help'
   );
 
 } else {
@@ -53,17 +53,17 @@ if (argv.v || argv.version) {
     key = fs.readFileSync(home + '/.tinypng', 'utf8').trim();
   }
 
-  if (argv.rw || argv.width) {
-    if (typeof(argv.rw || argv.width) === 'number') {
-      resize.width = (argv.rw || argv.width);
+  if (argv.width) {
+    if (typeof(argv.width) === 'number') {
+      resize.width = argv.width;
     } else {
       console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
     }
   }
 
-  if (argv.rh || argv.height) {
-    if (typeof(argv.rh || argv.height) === 'number') {
-      resize.height = (argv.rh || argv.height);
+  if (argv.height) {
+    if (typeof(argv.height) === 'number') {
+      resize.height = argv.height;
     } else {
       console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
     }
@@ -124,6 +124,7 @@ if (argv.v || argv.version) {
                 console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
 
                 if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
+
                   request.get(body.output.url, {
                     auth: {
                       'user': 'api',
@@ -133,6 +134,7 @@ if (argv.v || argv.version) {
                       'resize': resize
                     }
                   }).pipe(fs.createWriteStream(file));
+
                 } else {
 
                   request.get(body.output.url).pipe(fs.createWriteStream(file));

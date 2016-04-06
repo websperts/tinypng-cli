@@ -45,6 +45,12 @@ You may also provide multiple single PNG images.
 
 	tinypng assets/img/demo1.png assets/img/demo2.png
 
+To resize an image, use the `--width` and/or `--height` flag.
+
+	tinypng assets/img/demo.png --width 123
+	tinypng assets/img/demo.png --height 123
+	tinypng assets/img/demo.png --width 123 --height 123
+
 That's it. Pretty easy, huh?
 
 ## Changelog
