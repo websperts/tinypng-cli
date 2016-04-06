@@ -31,5 +31,12 @@
   "preferGlobal": "true",
   "bin": {
     "tinypng": "tinypng-cli.js"
+  },
+  "devDependencies": {
+    "eslint": "^2.7.0",
+    "jshint": "^2.9.1"
+  },
+  "scripts": {
+    "test": "jshint tinypng-cli.js && eslint tinypng-cli.js"
   }
 }

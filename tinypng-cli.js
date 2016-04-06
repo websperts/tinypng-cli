@@ -14,151 +14,157 @@ var version = require('./package.json').version;
 
 if (argv.v || argv.version) {
 
-    console.log(version);
+  console.log(version);
 
 } else if (argv.h || argv.help) {
 
-    console.log(
-        'Usage\n' +
-        '  tinypng <path>\n' +
-        '\n' +
-        'Example\n' +
-        '  tinypng .\n' +
-        '  tinypng assets/img\n' +
-        '  tinypng assets/img/test.png\n' +
-        '  tinypng assets/img/test.jpg\n' +
-        '\n' +
-        'Options\n' +
-        '  -k, --key         Provide an API key\n' +
-        '  -rw, --width      Resize an image to a specified width\n' +
-        '  -rh, --height     Resize an image to a specified height\n' +
-        '  -r, --recursive   Walk given directory recursively\n' +
-        '  -v, --version     Show installed version\n' +
-        '  -h, --help        Show help'
-    );
+  console.log(
+    'Usage\n' +
+    '  tinypng <path>\n' +
+    '\n' +
+    'Example\n' +
+    '  tinypng .\n' +
+    '  tinypng assets/img\n' +
+    '  tinypng assets/img/test.png\n' +
+    '  tinypng assets/img/test.jpg\n' +
+    '\n' +
+    'Options\n' +
+    '  -k, --key     Provide an API key\n' +
+    '  -rw, --width    Resize an image to a specified width\n' +
+    '  -rh, --height   Resize an image to a specified height\n' +
+    '  -r, --recursive   Walk given directory recursively\n' +
+    '  -v, --version   Show installed version\n' +
+    '  -h, --help    Show help'
+  );
 
 } else {
 
-    console.log(chalk.underline.bold('TinyPNG CLI'));
-    console.log('v' + version + '\n');
+  console.log(chalk.underline.bold('TinyPNG CLI'));
+  console.log('v' + version + '\n');
 
-    var files = argv._.length ? argv._ : ['.'];
+  var files = argv._.length ? argv._ : ['.'];
 
-    var key = '';
-    var resize = {};
+  var key = '';
+  var resize = {};
 
-    if (argv.k || argv.key) {
-        key = typeof (argv.k || argv.key) === 'string' ? (argv.k || argv.key).trim() : '';
-    } else if (fs.existsSync(home + '/.tinypng')) {
-        key = fs.readFileSync(home + '/.tinypng', 'utf8').trim();
+  if (argv.k || argv.key) {
+    key = typeof(argv.k || argv.key) === 'string' ? (argv.k || argv.key).trim() : '';
+  } else if (fs.existsSync(home + '/.tinypng')) {
+    key = fs.readFileSync(home + '/.tinypng', 'utf8').trim();
+  }
+
+  if (argv.rw || argv.width) {
+    if (typeof(argv.rw || argv.width) === 'number') {
+      resize.width = (argv.rw || argv.width);
+    } else {
+      console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
     }
+  }
 
-    if (argv.rw || argv.width) {
-        if (typeof (argv.rw || argv.width) === 'number') {
-            resize.width = (argv.rw || argv.width);
-        } else {
-            console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
+  if (argv.rh || argv.height) {
+    if (typeof(argv.rh || argv.height) === 'number') {
+      resize.height = (argv.rh || argv.height);
+    } else {
+      console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
+    }
+  }
+
+  if (key.length === 0) {
+
+    console.log(chalk.bold.red('No API key specified. You can get one at ' + chalk.underline('https://tinypng.com/developers') + '.'));
+
+  } else {
+
+    var images = [];
+
+    files.forEach(function(file) {
+      if (fs.existsSync(file)) {
+        if (fs.lstatSync(file).isDirectory()) {
+          images = images.concat(glob.sync(file + (argv.r || argv.recursive ? '/**' : '') + '/*.+(png|jpg|jpeg)'));
+        } else if (minimatch(file, '*.+(png|jpg|jpeg)', {
+            matchBase: true
+          })) {
+          images.push(file);
         }
-    }
+      }
+    });
 
-    if (argv.rh || argv.height) {
-        if (typeof (argv.rh || argv.height) === 'number') {
-            resize.height = (argv.rh || argv.height);
-        } else {
-            console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
-        }
-    }
+    var unique = uniq(images);
 
-    if (key.length === 0) {
+    if (unique.length === 0) {
 
-        console.log(chalk.bold.red('No API key specified. You can get one at ' + chalk.underline('https://tinypng.com/developers') + '.'));
+      console.log(chalk.bold.red('\u2718 No PNG or JPEG images found.'));
 
     } else {
 
-        var images = [];
+      console.log(chalk.bold.green('\u2714 Found ' + unique.length + ' image' + (unique.length === 1 ? '' : 's')) + '\n');
+      console.log(chalk.bold('Processing...'));
 
-        files.forEach(function(file) {
-            if (fs.existsSync(file)) {
-                if (fs.lstatSync(file).isDirectory()) {
-                    images = images.concat(glob.sync(file + (argv.r || argv.recursive ? '/**' : '') + '/*.+(png|jpg|jpeg)'));
-                } else if (minimatch(file, '*.+(png|jpg|jpeg)', {
-                    matchBase: true
-                })) {
-                    images.push(file);
-                }
-            }
-        });
+      unique.forEach(function(file) {
 
-        var unique = uniq(images);
+        fs.createReadStream(file).pipe(request.post('https://api.tinify.com/shrink', {
+          auth: {
+            'user': 'api',
+            'pass': key
+          }
+        }, function(error, response, body) {
 
-        if (unique.length === 0) {
+          try {
+            body = JSON.parse(body);
+          } catch (e) {
+            console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
+          }
 
-            console.log(chalk.bold.red('\u2718 No PNG or JPEG images found.'));
+          if (response !== undefined) {
 
-        } else {
+            if (response.statusCode === 201) {
 
-            console.log(chalk.bold.green('\u2714 Found ' + unique.length + ' image' + (unique.length === 1 ? '' : 's')) + '\n');
-            console.log(chalk.bold('Processing...'));
+              if (body.output.size < body.input.size) {
 
-            unique.forEach(function(file) {
+                console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
 
-                fs.createReadStream(file).pipe(request.post('https://api.tinify.com/shrink', {
+                if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
+                  request.get(body.output.url, {
                     auth: {
-                        'user': 'api',
-                        'pass': key
+                      'user': 'api',
+                      'pass': key
+                    },
+                    json: {
+                      'resize': resize
                     }
-                }, function (error, response, body) {
+                  }).pipe(fs.createWriteStream(file));
+                } else {
 
-                    try {
-                        body = JSON.parse(body);
-                    } catch(e) {
-                        console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
-                    }
+                  request.get(body.output.url).pipe(fs.createWriteStream(file));
 
-                    if (response !== undefined) {
+                }
 
-                        if (response.statusCode === 201) {
+              } else {
 
-                            if (body.output.size < body.input.size) {
+                console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
 
-                                console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
+              }
 
-                                if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
-                                  request.get(body.output.url, {
-                                    auth: {'user': 'api','pass': key},
-                                    json:{'resize':resize}}).pipe(fs.createWriteStream(file));
-                                } else {
+            } else {
 
-                                  request.get(body.output.url).pipe(fs.createWriteStream(file));
+              if (body.error === 'TooManyRequests') {
+                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your monthly limit has been exceeded'));
+              } else if (body.error === 'Unauthorized') {
+                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your credentials are invalid'));
+              } else {
+                console.log(chalk.red('\u2718 Compression failed for `' + file + '`'));
+              }
 
-                                }
+            }
+          } else {
+            console.log(chalk.red('\u2718 Got no response for `' + file + '`'));
+          }
+        }));
 
-                            } else {
-
-                                console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
-
-                            }
-
-                        } else {
-
-                            if (body.error === 'TooManyRequests') {
-                                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your monthly limit has been exceeded'));
-                            } else if (body.error === 'Unauthorized') {
-                                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your credentials are invalid'));
-                            } else {
-                                console.log(chalk.red('\u2718 Compression failed for `' + file + '`'));
-                            }
-
-                        }
-                    } else {
-                        console.log(chalk.red('\u2718 Got no response for `' + file + '`'));
-                    }
-                }));
-
-            });
-
-        }
+      });
 
     }
+
+  }
 
 }
