@@ -51,6 +51,8 @@ That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.6
+	* Prevent any file changes in case JSON parsing fails or any other HTTP error occurred
 * 0.0.5
 	* Add support for image resize functionality
 * 0.0.4
