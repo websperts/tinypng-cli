@@ -113,9 +113,10 @@ if (argv.v || argv.version) {
             body = JSON.parse(body);
           } catch (e) {
             console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
+            return;
           }
 
-          if (response !== undefined) {
+          if (!error && response) {
 
             if (response.statusCode === 201) {
 
