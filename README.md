@@ -27,7 +27,7 @@ To shrink all PNG images within the current directory and subdirectoies, use the
 
 To shrink all PNG images within a specific directory (`assets/img` in this example), you may run the following command.
 
-	tinypng assets/img
+	tinypng assets/img -r
 
 You may also provide multiple directories.
 
