@@ -51,6 +51,8 @@ That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.7
+	* Implement support for uppercase file extensions
 * 0.0.6
 	* Prevent any file changes in case JSON parsing fails or any other HTTP error occurred
 * 0.0.5
@@ -72,7 +74,7 @@ That's it. Pretty easy, huh?
 
 ## License
 
-Copyright (c) 2016 [websperts](http://websperts.com/)  
+Copyright (c) 2017 [websperts](http://websperts.com/)  
 Licensed under the MIT license.
 
 See LICENSE for more info.
@@ -85,3 +87,4 @@ See LICENSE for more info.
 - [@mvenghaus](https://github.com/mvenghaus)
 - [@jblok](https://github.com/jblok)
 - [@tomatolicious](https://github.com/tomatolicious)
+- [@kolya182](https://github.com/kolya182)
