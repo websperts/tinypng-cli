@@ -33,6 +33,7 @@ if (argv.v || argv.version) {
     '  -r, --recursive  Walk given directory recursively\n' +
     '  --width          Resize an image to a specified width\n' +
     '  --height         Resize an image to a specified height\n' +
+    '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n',
     '  -v, --version    Show installed version\n' +
     '  -h, --help       Show help'
   );
@@ -46,6 +47,7 @@ if (argv.v || argv.version) {
 
   var key = '';
   var resize = {};
+  var resize_modes = ['scale', 'fit', 'cover'];
 
   if (argv.k || argv.key) {
     key = typeof(argv.k || argv.key) === 'string' ? (argv.k || argv.key).trim() : '';
@@ -66,6 +68,19 @@ if (argv.v || argv.version) {
       resize.height = argv.height;
     } else {
       console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
+    }
+  }
+
+  if (argv['resize-method']) {
+    if (typeof(argv['resize-method']) === 'string' && resize_modes.includes(argv['resize-method'].toLowerCase()))
+    {
+      if (argv['resize-method'] != 'scale' && resize.width === undefined || argv['resize-method'] != 'scale' && resize.height === undefined) {
+        console.log(chalk.bold.red('This resize mode requires you to specify a width and a height.'));      
+      } else {
+        resize.method = argv['resize-method'];
+      }
+    } else {
+      console.log(chalk.bold.red(`Invalid resize mode specified. Valid modes are: ${resize_modes.join(', ')}`));      
     }
   }
 
