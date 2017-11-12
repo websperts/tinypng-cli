@@ -33,7 +33,7 @@ if (argv.v || argv.version) {
     '  -r, --recursive  Walk given directory recursively\n' +
     '  --width          Resize an image to a specified width\n' +
     '  --height         Resize an image to a specified height\n' +
-    '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n',
+    '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n' +
     '  -v, --version    Show installed version\n' +
     '  -h, --help       Show help'
   );
