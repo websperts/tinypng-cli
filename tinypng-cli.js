@@ -7,6 +7,7 @@ var glob = require('glob');
 var uniq = require('array-uniq');
 var chalk = require('chalk');
 var pretty = require('prettysize');
+var imageinfo = require('imageinfo');
 
 var argv = require('minimist')(process.argv.slice(2));
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
@@ -34,6 +35,7 @@ if (argv.v || argv.version) {
     '  --width          Resize an image to a specified width\n' +
     '  --height         Resize an image to a specified height\n' +
     '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n' +
+    '  --if-larger-than Optimize only if width or height is bigger than the provided value (in pixels)\n' +
     '  -v, --version    Show installed version\n' +
     '  -h, --help       Show help'
   );
@@ -72,15 +74,23 @@ if (argv.v || argv.version) {
   }
 
   if (argv['resize-method']) {
-    if (typeof(argv['resize-method']) === 'string' && resize_modes.includes(argv['resize-method'].toLowerCase()))
-    {
+    if (typeof(argv['resize-method']) === 'string' && resize_modes.includes(argv['resize-method'].toLowerCase())) {
       if (argv['resize-method'] != 'scale' && resize.width === undefined || argv['resize-method'] != 'scale' && resize.height === undefined) {
-        console.log(chalk.bold.red('This resize mode requires you to specify a width and a height.'));      
+        console.log(chalk.bold.red('This resize mode requires you to specify a width and a height.'));
       } else {
         resize.method = argv['resize-method'];
       }
     } else {
-      console.log(chalk.bold.red(`Invalid resize mode specified. Valid modes are: ${resize_modes.join(', ')}`));      
+      console.log(chalk.bold.red(`Invalid resize mode specified. Valid modes are: ${resize_modes.join(', ')}`));
+    }
+  }
+
+  if (argv['if-larger-than']) {
+    if (typeof(argv['if-larger-than']) === 'number') {
+      resize.maxSize = argv['if-larger-than'];
+      console.log('filter: image should be larger than ' + resize.maxSize + ' pixels (width or height) to be processed\n');
+    } else {
+      console.log(chalk.bold.red(`Invalid size specified. Please use a number (in pixels).`));
     }
   }
 
@@ -117,72 +127,87 @@ if (argv.v || argv.version) {
 
       unique.forEach(function(file) {
 
-        fs.createReadStream(file).pipe(request.post('https://api.tinify.com/shrink', {
-          auth: {
-            'user': 'api',
-            'pass': key
+        fs.readFile(file, function(err, data) {
+          if (err) throw err;
+
+          var push = true;
+          var info = imageinfo(data);
+
+          if (resize.maxSize) {
+            var thisMaxSize = Math.max(info.width, info.height);
+            if (thisMaxSize < resize.maxSize) {
+              console.log(chalk.red('\u0021 Image is too small (' + info.width + 'x' + info.height + '): `' + file + '`'));
+              push = false;
+            }
           }
-        }, function(error, response, body) {
 
-          try {
-            body = JSON.parse(body);
-          } catch (e) {
-            console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
-            return;
-          }
+          if (push === true) {
 
-          if (!error && response) {
+            fs.createReadStream(file).pipe(request.post('https://api.tinify.com/shrink', {
+              auth: {
+                'user': 'api',
+                'pass': key
+              }
+            }, function(error, response, body) {
 
-            if (response.statusCode === 201) {
+              try {
+                body = JSON.parse(body);
+              } catch (e) {
+                console.log(chalk.red('\u2718 Not a valid JSON response for `' + file + '`'));
+                return;
+              }
 
-              if (body.output.size < body.input.size) {
+              if (!error && response) {
 
-                console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
+                if (response.statusCode === 201) {
 
-                if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
+                  if (body.output.size < body.input.size) {
 
-                  request.get(body.output.url, {
-                    auth: {
-                      'user': 'api',
-                      'pass': key
-                    },
-                    json: {
-                      'resize': resize
+                    console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
+
+                    if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
+
+                      request.get(body.output.url, {
+                        auth: {
+                          'user': 'api',
+                          'pass': key
+                        },
+                        json: {
+                          'resize': resize
+                        }
+                      }).pipe(fs.createWriteStream(file));
+
+                    } else {
+
+                      request.get(body.output.url).pipe(fs.createWriteStream(file));
+
                     }
-                  }).pipe(fs.createWriteStream(file));
+
+                  } else {
+
+                    console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
+
+                  }
 
                 } else {
 
-                  request.get(body.output.url).pipe(fs.createWriteStream(file));
+                  if (body.error === 'TooManyRequests') {
+                    console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your monthly limit has been exceeded'));
+                  } else if (body.error === 'Unauthorized') {
+                    console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your credentials are invalid'));
+                  } else {
+                    console.log(chalk.red('\u2718 Compression failed for `' + file + '`'));
+                  }
 
                 }
-
               } else {
-
-                console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
-
+                console.log(chalk.red('\u2718 Got no response for `' + file + '`'));
               }
+            }));
 
-            } else {
-
-              if (body.error === 'TooManyRequests') {
-                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your monthly limit has been exceeded'));
-              } else if (body.error === 'Unauthorized') {
-                console.log(chalk.red('\u2718 Compression failed for `' + file + '` as your credentials are invalid'));
-              } else {
-                console.log(chalk.red('\u2718 Compression failed for `' + file + '`'));
-              }
-
-            }
-          } else {
-            console.log(chalk.red('\u2718 Got no response for `' + file + '`'));
           }
-        }));
-
+        });
       });
-
     }
-
   }
-
 }

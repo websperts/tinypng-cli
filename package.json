@@ -23,6 +23,7 @@
     "array-uniq": "^1.0.2",
     "chalk": "^1.1.3",
     "glob": "^7.0.3",
+    "imageinfo": "^1.0.4",
     "minimatch": "^3.0.0",
     "minimist": "^1.2.0",
     "prettysize": "0.0.3",
@@ -33,8 +34,8 @@
     "tinypng": "tinypng-cli.js"
   },
   "devDependencies": {
-    "eslint": "^2.7.0",
-    "jshint": "^2.9.1"
+    "eslint": "^2.13.1",
+    "jshint": "^2.9.5"
   },
   "scripts": {
     "test": "jshint tinypng-cli.js && eslint tinypng-cli.js"
