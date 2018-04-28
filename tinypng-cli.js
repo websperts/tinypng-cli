@@ -36,6 +36,7 @@ if (argv.v || argv.version) {
     '  --height         Resize an image to a specified height\n' +
     '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n' +
     '  --if-larger-than Optimize only if width or height is bigger than the provided value (in pixels)\n' +
+    '  --if-bigger-than Optimize only if file weight if bigger than the provided value (in bytes)\n' +
     '  -v, --version    Show installed version\n' +
     '  -h, --help       Show help'
   );
@@ -94,6 +95,15 @@ if (argv.v || argv.version) {
     }
   }
 
+  if (argv['if-bigger-than']) {
+    if (typeof(argv['if-bigger-than']) === 'number') {
+      resize.maxWeight = argv['if-bigger-than'];
+      console.log('filter: files should be bigger than ' + pretty(resize.maxWeight) + ' to be processed\n');
+    } else {
+      console.log(chalk.bold.red(`Invalid weight specified. Please use a number (in bytes).`));
+    }
+  }
+
   if (key.length === 0) {
 
     console.log(chalk.bold.red('No API key specified. You can get one at ' + chalk.underline('https://tinypng.com/developers') + '.'));
@@ -137,6 +147,13 @@ if (argv.v || argv.version) {
             var thisMaxSize = Math.max(info.width, info.height);
             if (thisMaxSize < resize.maxSize) {
               console.log(chalk.red('\u0021 Image is too small (' + info.width + 'x' + info.height + '): `' + file + '`'));
+              push = false;
+            }
+          }
+
+          if (resize.maxWeight) {
+            if (data.length < resize.maxWeight) {
+              console.log(chalk.red('\u0021 File is too light ' + chalk.bold(pretty(data.length)) + ': `' + file + '`'));
               push = false;
             }
           }
