@@ -13,8 +13,6 @@ var argv = require('minimist')(process.argv.slice(2));
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 var version = require('./package.json').version;
 
-var optimizedCounter;
-
 if (argv.v || argv.version) {
 
   console.log(version);
@@ -139,6 +137,7 @@ if (argv.v || argv.version) {
 
     } else {
 
+			var optimizedCounter;
       process.on('exit', function() {
         if (optimizedCounter) console.log(chalk.bold.green('\u2714 Number of optimized files this month: ' + optimizedCounter));
       });
