@@ -29,9 +29,9 @@ To shrink all PNG images within a specific directory (`assets/img` in this examp
 
 	tinypng assets/img
 
-You may also provide multiple directories.
+You may also provide multiple directories or a wildcard at the end to filter some files
 
-	tinypng assets/img1 assets/img2
+	tinypng assets/img1 assets/img2 assets/imagesBeginningWithSomething*
 
 To shrink a single PNG image (`assets/img/demo.png` in this example), you may run the following command.
 
@@ -47,10 +47,39 @@ To resize an image, use the `--width` and/or `--height` flag.
 	tinypng assets/img/demo.png --height 123
 	tinypng assets/img/demo.png --width 123 --height 123
 
+You may need to resize some large files only, you know, these ones provided by your customers ;)  
+
+	tinypng --if-larger-than 1600 assets/img
+	tinypng --if-bigger-than 1572864 assets/img
+
+To avoid the same files to be processed multiple times, a cache is created in the $HOME/.tinypng-cache/ directory.  
+
+You can bypass it:
+
+	tinypng --bypass-cache assets/img
+
+Or clear it:
+
+	tinypng --clear-cache
+  
+And maybe you need to print all the results on screen, in that case juste activate the verbose mode
+
+	tinypng assets/img/demo.png --width 123 --verbose
+
 That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.9
+	* Optimize only if file weight if bigger than the provided value (in bytes)
+	* Optimize only if width or height is bigger than the provided value (in pixels)
+	* Halt script on invalid argument
+	* Use a cache to not optimize the same file twice
+	* Verbose mode
+	* Add an argument to set the minimal acceptable compression (in %)
+	* Update README
+* 0.0.8
+	* Add support for different resize methods (by tomatolicious)
 * 0.0.7
 	* Implement support for uppercase file extensions
 * 0.0.6
@@ -88,3 +117,4 @@ See LICENSE for more info.
 - [@jblok](https://github.com/jblok)
 - [@tomatolicious](https://github.com/tomatolicious)
 - [@kolya182](https://github.com/kolya182)
+- [@zefranck](https://github.com/zefranck)
