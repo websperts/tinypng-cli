@@ -82,8 +82,8 @@ if (argv.v || argv.version) {
       });
     }
     console.log(chalk.bold(`Cache is clean`));
-    return;
-  };
+    process.exit(-1);
+  }
 
   if (argv.V) {
   	console.log('. Verbose mode is ON');
@@ -95,7 +95,7 @@ if (argv.v || argv.version) {
       resize.width = argv.width;
     } else {
       console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
-      return;
+			process.exit(-1);
     }
   }
 
@@ -104,7 +104,7 @@ if (argv.v || argv.version) {
       resize.height = argv.height;
     } else {
       console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
-      return;
+			process.exit(-1);
     }
   }
 
@@ -117,7 +117,7 @@ if (argv.v || argv.version) {
       }
     } else {
       console.log(chalk.bold.red(`Invalid resize mode specified. Valid modes are: ${resize_modes.join(', ')}`));
-      return;
+			process.exit(-1);
     }
   }
 
@@ -127,7 +127,7 @@ if (argv.v || argv.version) {
       console.log('. Image(s) should be larger than ' + resize.maxSize + ' pixels (width or height) to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid size specified. Please use a number (in pixels).`));
-      return;
+			process.exit(-1);
     }
   }
 
@@ -137,14 +137,14 @@ if (argv.v || argv.version) {
       console.log('. Files should be bigger than ' + pretty(resize.maxWeight) + ' to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid weight specified. Please use a number (in bytes).`));
-      return;
+			process.exit(-1);
     }
   }
 
   if (key.length === 0) {
 
     console.log(chalk.bold.red('No API key specified. You can get one at ' + chalk.underline('https://tinypng.com/developers') + '.'));
-    return;
+		process.exit(-1);
 
   } else {
 
