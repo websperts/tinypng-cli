@@ -77,6 +77,7 @@ That's it. Pretty easy, huh?
 	* Use a cache to not optimize the same file twice
 	* Verbose mode
 	* Add an argument to set the minimal acceptable compression (in %)
+	* Returns the number of calls for the current month (value is sent by the tinypng service) 
 	* Update README
 * 0.0.8
 	* Add support for different resize methods (by tomatolicious)
