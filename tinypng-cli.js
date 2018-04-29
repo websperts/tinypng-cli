@@ -65,6 +65,7 @@ if (argv.v || argv.version) {
       resize.width = argv.width;
     } else {
       console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
+      return;
     }
   }
 
@@ -73,6 +74,7 @@ if (argv.v || argv.version) {
       resize.height = argv.height;
     } else {
       console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
+      return;
     }
   }
 
@@ -85,6 +87,7 @@ if (argv.v || argv.version) {
       }
     } else {
       console.log(chalk.bold.red(`Invalid resize mode specified. Valid modes are: ${resize_modes.join(', ')}`));
+      return;
     }
   }
 
@@ -94,6 +97,7 @@ if (argv.v || argv.version) {
       console.log('filter: image should be larger than ' + resize.maxSize + ' pixels (width or height) to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid size specified. Please use a number (in pixels).`));
+      return;
     }
   }
 
@@ -103,6 +107,7 @@ if (argv.v || argv.version) {
       console.log('filter: files should be bigger than ' + pretty(resize.maxWeight) + ' to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid weight specified. Please use a number (in bytes).`));
+      return;
     }
   }
 
