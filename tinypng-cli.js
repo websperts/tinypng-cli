@@ -38,12 +38,14 @@ if (argv.v || argv.version) {
     '  -r, --recursive  Walk given directory recursively\n' +
     '  --width          Resize an image to a specified width\n' +
     '  --height         Resize an image to a specified height\n' +
+    '  --minimal        Minimal compression we accept (in %)\n' +
     '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n' +
     '  --if-larger-than Optimize only if width or height is bigger than the provided value (in pixels)\n' +
     '  --if-bigger-than Optimize only if file weight if bigger than the provided value (in bytes)\n' +
     '  --clear-cache 		Clear cache and stop\n' +
+    '  --bypass-cache 	Bypass cache and force optimisation\n' +
     '  -v, --version    Show installed version\n' +
-    '  -V								Verbose mode\n' +
+    '  -V, --verbose		Verbose mode\n' +
     '  -h, --help       Show help'
   );
 
@@ -59,6 +61,7 @@ if (argv.v || argv.version) {
   var resize_modes = ['scale', 'fit', 'cover'];
 
   var verbose = false;
+  var bypassCache = false;
 
   if (argv.k || argv.key) {
     key = typeof(argv.k || argv.key) === 'string' ? (argv.k || argv.key).trim() : '';
@@ -85,17 +88,21 @@ if (argv.v || argv.version) {
     process.exit(-1);
   }
 
-  if (argv.V) {
-  	console.log('. Verbose mode is ON');
-  	verbose = true;
-	}
+  if (argv['bypass-cache']) {
+    bypassCache = true;
+  }
+
+  if (argv.V || argv.verbose) {
+    console.log('. Verbose mode is ON');
+    verbose = true;
+  }
 
   if (argv.width) {
     if (typeof(argv.width) === 'number') {
       resize.width = argv.width;
     } else {
       console.log(chalk.bold.red('Invalid width specified. Please specify a numeric value only.'));
-			process.exit(-1);
+      process.exit(-1);
     }
   }
 
@@ -104,7 +111,17 @@ if (argv.v || argv.version) {
       resize.height = argv.height;
     } else {
       console.log(chalk.bold.red('Invalid height specified. Please specify a numeric value only.'));
-			process.exit(-1);
+      process.exit(-1);
+    }
+  }
+
+  if (argv.minimal) {
+    if (typeof(argv.minimal) === 'number') {
+      resize.minimal = argv.minimal;
+      console.log(`. Acceptable minimal efficiency is set to ${resize.minimal}%`);
+    } else {
+      console.log(chalk.bold.red('Invalid minimal specified. Please specify a numeric value only.'));
+      process.exit(-1);
     }
   }
 
@@ -117,7 +134,7 @@ if (argv.v || argv.version) {
       }
     } else {
       console.log(chalk.bold.red(`Invalid resize mode specified. Valid modes are: ${resize_modes.join(', ')}`));
-			process.exit(-1);
+      process.exit(-1);
     }
   }
 
@@ -127,7 +144,7 @@ if (argv.v || argv.version) {
       console.log('. Image(s) should be larger than ' + resize.maxSize + ' pixels (width or height) to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid size specified. Please use a number (in pixels).`));
-			process.exit(-1);
+      process.exit(-1);
     }
   }
 
@@ -137,14 +154,14 @@ if (argv.v || argv.version) {
       console.log('. Files should be bigger than ' + pretty(resize.maxWeight) + ' to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid weight specified. Please use a number (in bytes).`));
-			process.exit(-1);
+      process.exit(-1);
     }
   }
 
   if (key.length === 0) {
 
     console.log(chalk.bold.red('No API key specified. You can get one at ' + chalk.underline('https://tinypng.com/developers') + '.'));
-		process.exit(-1);
+    process.exit(-1);
 
   } else {
 
@@ -202,7 +219,7 @@ if (argv.v || argv.version) {
           }
 
           var hash = md5(file + JSON.stringify(resize));
-          if (fs.existsSync(`${cacheDirectory}/${hash}`)) {
+          if (fs.existsSync(`${cacheDirectory}/${hash}`) && bypassCache === false) {
             if (verbose) console.log(chalk.red(`\u0021 File already packed: ${file}`));
             push = false;
           }
@@ -229,9 +246,15 @@ if (argv.v || argv.version) {
 
                   optimizedCounter = response.headers['compression-count'];
 
-                  if (body.output.size < body.input.size) {
+                  var efficiency = Math.round(100 - 100 / body.input.size * body.output.size);
+                  var save = true;
+                  if (efficiency < resize.minimal) save = false;
 
-                    console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
+                  if (body.output.size < body.input.size && save === true) {
+
+                    console.log(chalk.green('\u2714 Panda just saved you ' +
+                      chalk.bold(pretty(body.input.size - body.output.size) + ` (${efficiency}%)`) +
+                      ` for ${file}`));
 
                     fs.writeFile(cacheDirectory + hash, hash, (error) => {
                       if (error) {
@@ -258,7 +281,7 @@ if (argv.v || argv.version) {
                     }
                   } else {
 
-                    console.log(chalk.yellow(`\u2718 Couldn’t compress ${file} any further`));
+                    if (verbose) console.log(chalk.yellow('\u2718 Couldn’t compress ' + chalk.bold(file) + ' any further'));
 
                   }
 
