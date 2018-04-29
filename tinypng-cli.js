@@ -1,17 +1,21 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
-var request = require('request');
-var minimatch = require('minimatch');
-var glob = require('glob');
-var uniq = require('array-uniq');
-var chalk = require('chalk');
-var pretty = require('prettysize');
-var imageinfo = require('imageinfo');
+const fs = require('fs');
+const request = require('request');
+const minimatch = require('minimatch');
+const glob = require('glob');
+const uniq = require('array-uniq');
+const chalk = require('chalk');
+const pretty = require('prettysize');
+const imageinfo = require('imageinfo');
+const md5 = require('js-md5');
+const emptyFolder = require('empty-folder');
 
 var argv = require('minimist')(process.argv.slice(2));
 var home = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 var version = require('./package.json').version;
+
+var cacheDirectory = home + '/.tinypng-cache/';
 
 if (argv.v || argv.version) {
 
@@ -37,6 +41,7 @@ if (argv.v || argv.version) {
     '  --resize-mode    Specify the resize method to use (scale, fit or cover)\n' +
     '  --if-larger-than Optimize only if width or height is bigger than the provided value (in pixels)\n' +
     '  --if-bigger-than Optimize only if file weight if bigger than the provided value (in bytes)\n' +
+    '  --clear-cache 		Clear cache and stop\n' +
     '  -v, --version    Show installed version\n' +
     '  -h, --help       Show help'
   );
@@ -57,6 +62,25 @@ if (argv.v || argv.version) {
   } else if (fs.existsSync(home + '/.tinypng')) {
     key = fs.readFileSync(home + '/.tinypng', 'utf8').trim();
   }
+
+  if (!fs.existsSync(cacheDirectory)) {
+    fs.mkdirSync(cacheDirectory);
+    console.log(chalk.bold(`Cache directory does not exist:`) + ` creating ${cacheDirectory}`);
+  }
+
+  if (argv['clear-cache']) {
+    if (fs.existsSync(cacheDirectory)) {
+
+      emptyFolder(cacheDirectory, false, (o) => {
+        if (o.error) {
+          console.log(chalk.bold(`Cannot empty cache directory: ` + err));
+          return;
+        }
+      });
+    }
+    console.log(chalk.bold(`Cache is clean`));
+    return;
+  };
 
   if (argv.width) {
     if (typeof(argv.width) === 'number') {
@@ -137,7 +161,7 @@ if (argv.v || argv.version) {
 
     } else {
 
-			var optimizedCounter;
+      var optimizedCounter;
       process.on('exit', function() {
         if (optimizedCounter) console.log(chalk.bold.green('\u2714 Number of optimized files this month: ' + optimizedCounter));
       });
@@ -168,6 +192,12 @@ if (argv.v || argv.version) {
             }
           }
 
+          var hash = md5(file + JSON.stringify(resize));
+          if (fs.existsSync(`${cacheDirectory}/${hash}`)) {
+            console.log(chalk.red(`\u0021 File already packed: ${file}`));
+            push = false;
+          }
+
           if (push === true) {
 
             fs.createReadStream(file).pipe(request.post('https://api.tinify.com/shrink', {
@@ -194,6 +224,12 @@ if (argv.v || argv.version) {
 
                     console.log(chalk.green('\u2714 Panda just saved you ' + chalk.bold(pretty(body.input.size - body.output.size) + ' (' + Math.round(100 - 100 / body.input.size * body.output.size) + '%)') + ' for `' + file + '`'));
 
+                    fs.writeFile(cacheDirectory + hash, hash, (error) => {
+                      if (error) {
+                        console.log(chalk.red('\u2718 Cannot write cache file'));
+                      }
+                    });
+
                     if (resize.hasOwnProperty('height') || resize.hasOwnProperty('width')) {
 
                       request.get(body.output.url, {
@@ -211,10 +247,9 @@ if (argv.v || argv.version) {
                       request.get(body.output.url).pipe(fs.createWriteStream(file));
 
                     }
-
                   } else {
 
-                    console.log(chalk.yellow('\u2718 Couldn’t compress `' + file + '` any further'));
+                    console.log(chalk.yellow(`\u2718 Couldn’t compress ${file} any further`));
 
                   }
 
