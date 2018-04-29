@@ -43,6 +43,7 @@ if (argv.v || argv.version) {
     '  --if-bigger-than Optimize only if file weight if bigger than the provided value (in bytes)\n' +
     '  --clear-cache 		Clear cache and stop\n' +
     '  -v, --version    Show installed version\n' +
+    '  -V								Verbose mode\n' +
     '  -h, --help       Show help'
   );
 
@@ -56,6 +57,8 @@ if (argv.v || argv.version) {
   var key = '';
   var resize = {};
   var resize_modes = ['scale', 'fit', 'cover'];
+
+  var verbose = false;
 
   if (argv.k || argv.key) {
     key = typeof(argv.k || argv.key) === 'string' ? (argv.k || argv.key).trim() : '';
@@ -81,6 +84,11 @@ if (argv.v || argv.version) {
     console.log(chalk.bold(`Cache is clean`));
     return;
   };
+
+  if (argv.V) {
+  	console.log('. Verbose mode is ON');
+  	verbose = true;
+	}
 
   if (argv.width) {
     if (typeof(argv.width) === 'number') {
@@ -116,7 +124,7 @@ if (argv.v || argv.version) {
   if (argv['if-larger-than']) {
     if (typeof(argv['if-larger-than']) === 'number') {
       resize.maxSize = argv['if-larger-than'];
-      console.log('filter: image should be larger than ' + resize.maxSize + ' pixels (width or height) to be processed\n');
+      console.log('. Image(s) should be larger than ' + resize.maxSize + ' pixels (width or height) to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid size specified. Please use a number (in pixels).`));
       return;
@@ -126,7 +134,7 @@ if (argv.v || argv.version) {
   if (argv['if-bigger-than']) {
     if (typeof(argv['if-bigger-than']) === 'number') {
       resize.maxWeight = argv['if-bigger-than'];
-      console.log('filter: files should be bigger than ' + pretty(resize.maxWeight) + ' to be processed\n');
+      console.log('. Files should be bigger than ' + pretty(resize.maxWeight) + ' to be processed\n');
     } else {
       console.log(chalk.bold.red(`Invalid weight specified. Please use a number (in bytes).`));
       return;
@@ -136,6 +144,7 @@ if (argv.v || argv.version) {
   if (key.length === 0) {
 
     console.log(chalk.bold.red('No API key specified. You can get one at ' + chalk.underline('https://tinypng.com/developers') + '.'));
+    return;
 
   } else {
 
@@ -180,21 +189,21 @@ if (argv.v || argv.version) {
           if (resize.maxSize) {
             var thisMaxSize = Math.max(info.width, info.height);
             if (thisMaxSize < resize.maxSize) {
-              console.log(chalk.red('\u0021 Image is too small (' + info.width + 'x' + info.height + '): `' + file + '`'));
+              if (verbose) console.log(chalk.red('\u0021 Image is too small (' + info.width + 'x' + info.height + '): `' + file + '`'));
               push = false;
             }
           }
 
           if (resize.maxWeight) {
             if (data.length < resize.maxWeight) {
-              console.log(chalk.red('\u0021 File is too light ' + chalk.bold(pretty(data.length)) + ': `' + file + '`'));
+              if (verbose) console.log(chalk.red('\u0021 File is too light ' + chalk.bold(pretty(data.length)) + ': `' + file + '`'));
               push = false;
             }
           }
 
           var hash = md5(file + JSON.stringify(resize));
           if (fs.existsSync(`${cacheDirectory}/${hash}`)) {
-            console.log(chalk.red(`\u0021 File already packed: ${file}`));
+            if (verbose) console.log(chalk.red(`\u0021 File already packed: ${file}`));
             push = false;
           }
 
