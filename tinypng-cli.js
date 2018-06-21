@@ -231,12 +231,6 @@ if (argv.v || argv.version) {
                                         );
                                         openStreams = openStreams + 1;
                                         fileStream.on("finish", function() {
-                                            console.log(
-                                                "Caching " +
-                                                    file +
-                                                    ": " +
-                                                    md5File.sync(file)
-                                            );
                                             cacheMap[file] = md5File.sync(file);
                                             openStreams = openStreams - 1;
                                         });
@@ -317,7 +311,6 @@ if (argv.v || argv.version) {
                     if (openStreams > 0) {
                         return setTimeout(saveCacheMapWhenCompvare, 100);
                     }
-                    console.log(cacheMap);
                     fs.writeFileSync(
                         cacheMapLocation,
                         JSON.stringify(cacheMap)
