@@ -28,6 +28,10 @@ To shrink all PNG images within a specific directory (`assets/img` in this examp
 
 	tinypng assets/img
 
+Need to limit the number of compressions at a time? Use the `-m, --max` flag:
+
+    tinypng assets/img --max 100
+
 You may also provide multiple directories.
 
 	tinypng assets/img1 assets/img2
@@ -59,6 +63,7 @@ That's it. Pretty easy, huh?
 * 0.0.8
     * Implement cache map support and support for forcing compression
     * Implement dry-run support
+    * Implement maximum runs support to enable batching
 * 0.0.7
 	* Implement support for uppercase file extensions
 * 0.0.6
