@@ -1,6 +1,6 @@
 {
   "name": "tinypng-cli",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Handy command line tool for shrinking PNG images using the TinyPNG API",
   "homepage": "https://github.com/websperts/tinypng-cli",
   "author": "websperts <hello@websperts.com>",
