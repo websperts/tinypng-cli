@@ -16,14 +16,13 @@ TinyPNG CLI allows you to provide your API key in two different ways. The more c
 
 	tinypng demo.png -k E99a18c4f8cb3EL5f2l08u368_922e03
 
-To shrink all PNG images within the current directory, you may run one of the following commands—both do exactly the same.
+To shrink all PNG images within the current directory.
 
-	tinypng
 	tinypng .
 
 To shrink all PNG images within the current directory and subdirectoies, use the `-r` flag
 
-	tinypng -r
+	tinypng . -r
 
 To shrink all PNG images within a specific directory (`assets/img` in this example), you may run the following command.
 
@@ -47,10 +46,19 @@ To resize an image, use the `--width` and/or `--height` flag.
 	tinypng assets/img/demo.png --height 123
 	tinypng assets/img/demo.png --width 123 --height 123
 
+By default, this tool caches a map of all compressed images sent to the API in `~/.tinypng.cache.json`. To change this directory, use the `-c, --cache` flag:
+
+    tinypng . -r --cache /path/to/myCache.json
+
+If you want to forcibly recompress assets, use the `--force` flag. For a dry run output of all files that will be sent to the API, use the `--dry-run` flag.
+
 That's it. Pretty easy, huh?
 
 ## Changelog
 
+* 0.0.8
+    * Implement cache map support and support for forcing compression
+    * Implement dry-run support
 * 0.0.7
 	* Implement support for uppercase file extensions
 * 0.0.6
