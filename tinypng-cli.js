@@ -46,6 +46,7 @@ if (argv.v || argv.version) {
             "  --dry-run        Dry run -- no files actually modified\n" +
             "  -c, --cache      Cache map location. Defaults to ~/.tinypng.cache.json\n" +
             "  -v, --version    Show installed version\n" +
+            "  -m, --max        Maximum to run at a time. Defaults to -1 (no max)\n" +
             "  -h, --help       Show help"
     );
 } else {
@@ -56,6 +57,7 @@ if (argv.v || argv.version) {
 
     var key = "";
     var resize = {};
+    var max = argv.m || argv.max ? (argv.m || argv.max) + 0 : -1;
 
     if (!argv["dry-run"]) {
         if (argv.k || argv.key) {
@@ -163,6 +165,11 @@ if (argv.v || argv.version) {
             console.log(chalk.bold("Processing..."));
 
             unique.forEach(function(file) {
+                if (max == 0) {
+                    return;
+                } else {
+                    max = max - 1;
+                }
                 openStreams = openStreams + 1;
 
                 if (argv["dry-run"]) {
