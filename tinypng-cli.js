@@ -313,7 +313,7 @@ if (argv.v || argv.version) {
                     }
                     fs.writeFileSync(
                         cacheMapLocation,
-                        JSON.stringify(cacheMap)
+                        JSON.stringify(cacheMap, null, "\t")
                     );
                 }
                 setTimeout(saveCacheMapWhenCompvare, 500);
