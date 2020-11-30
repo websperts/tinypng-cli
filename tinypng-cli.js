@@ -24,6 +24,10 @@ function pruneCached(images, cacheMap) {
     });
 }
 
+if (argv.p || argv.proxy) {
+    request = request.defaults({proxy: argv.p || argv.proxy})
+}
+
 if (argv.v || argv.version) {
     console.log(version);
 } else if (argv.h || argv.help) {
@@ -47,6 +51,7 @@ if (argv.v || argv.version) {
             "  -c, --cache      Cache map location. Defaults to ~/.tinypng.cache.json\n" +
             "  -v, --version    Show installed version\n" +
             "  -m, --max        Maximum to run at a time. Defaults to -1 (no max)\n" +
+            "  -p, --proxy      Use proxy\n" +
             "  -h, --help       Show help"
     );
 } else {
