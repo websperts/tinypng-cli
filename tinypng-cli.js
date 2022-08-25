@@ -127,11 +127,11 @@ if (argv.v || argv.version) {
                         glob.sync(
                             file +
                                 (argv.r || argv.recursive ? "/**" : "") +
-                                "/*.+(png|jpg|jpeg|PNG|JPG|JPEG)"
+                                "/*.+(png|jpg|jpeg|PNG|JPG|JPEG|webp|WEBP)"
                         )
                     );
                 } else if (
-                    minimatch(file, "*.+(png|jpg|jpeg|PNG|JPG|JPEG)", {
+                    minimatch(file, "*.+(png|jpg|jpeg|PNG|JPG|JPEG|webp|WEBP)", {
                         matchBase: true
                     })
                 ) {
