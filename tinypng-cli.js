@@ -56,7 +56,7 @@ if (argv.v || argv.version) {
     var files = argv._.length ? argv._ : ["."];
 
     var key = "";
-    var resize = {};
+    var resize = {method: 'scale'};
     var max = argv.m || argv.max ? (argv.m || argv.max) + 0 : -1;
 
     if (!argv["dry-run"]) {
